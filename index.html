@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign #104 Workflow Blueprint</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding: 30px 20px 80px;
+  }
+  h1 { text-align:center; color:#1a1a2e; font-size:22px; margin-bottom:6px; font-weight:700; }
+  .subtitle { text-align:center; color:#64748b; font-size:13px; margin-bottom:24px; }
+
+  .legend { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:28px; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:#475569; background:#fff; padding:5px 10px; border-radius:20px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .legend-dot { width:10px; height:10px; border-radius:3px; border:2px solid; flex-shrink:0; }
+
+  /* connectors */
+  .vline { width:2px; background:#cbd5e1; height:16px; flex-shrink:0; }
+  .merge-bar { height:2px; background:#cbd5e1; }
+
+  .flow { display:flex; flex-direction:column; align-items:center; width:100%; max-width:1200px; margin:0 auto; }
+
+  /* ── Node cards ── */
+  .node {
+    border-radius:10px; padding:10px 14px;
+    box-shadow:0 1px 4px rgba(0,0,0,.09);
+    border:1.5px solid transparent;
+    transition:box-shadow .15s, transform .15s;
+    width:100%;
+  }
+  .node:hover { box-shadow:0 5px 18px rgba(0,0,0,.14); transform:translateY(-1px); }
+  .node.trigger  { background:#fff7ed; border-color:#fb923c; }
+  .node.wait     { background:#fff7ed; border-color:#fb923c; }
+  .node.branch   { background:#f0fdf4; border-color:#22c55e; }
+  .node.email    { background:#eff6ff; border-color:#3b82f6; }
+  .node.wa       { background:#f0fdf4; border-color:#25D366; }
+  .node.delay    { background:#fdf4ff; border-color:#a855f7; }
+  .node.cond     { background:#f0fdf4; border-color:#22c55e; }
+  .node.exit     { background:#fef2f2; border-color:#ef4444; }
+  .node.disabled { background:#f8fafc; border-color:#cbd5e1; opacity:.55; }
+  .node.goal     { background:#fffbeb; border-color:#f59e0b; }
+
+  .node-type { font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#94a3b8; margin-bottom:2px; }
+  .node-title { font-size:12px; font-weight:700; color:#1e293b; line-height:1.3; }
+  .node-sub { font-size:10px; color:#64748b; margin-top:2px; line-height:1.4; }
+
+  .badge { display:inline-block; font-size:9px; font-weight:700; padding:1px 6px; border-radius:20px; margin-top:4px; }
+  .badge.ar   { background:#e0f2fe; color:#0369a1; }
+  .badge.en   { background:#dcfce7; color:#15803d; }
+  .badge.del  { background:#fee2e2; color:#dc2626; }
+  .badge.tpl  { background:#ede9fe; color:#6d28d9; }
+  .badge.warn { background:#fef3c7; color:#92400e; }
+  .badge.ok   { background:#dcfce7; color:#166534; }
+  .badge.wa   { background:#dcfce7; color:#15803d; }
+  .badge.new  { background:#e0f2fe; color:#0369a1; }
+
+  /* branch layouts */
+  .branch-row { display:flex; gap:16px; justify-content:center; align-items:flex-start; width:100%; }
+  .branch-col { display:flex; flex-direction:column; align-items:center; flex:1; }
+
+  .branch-label { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#fff; padding:3px 12px; border-radius:20px; margin-bottom:8px; white-space:nowrap; }
+  .branch-label.ar  { background:#0ea5e9; }
+  .branch-label.en  { background:#10b981; }
+  .branch-label.biz { background:#8b5cf6; }
+  .branch-label.run { background:#0ea5e9; }
+  .branch-label.oth { background:#64748b; }
+  .branch-label.no  { background:#ef4444; }
+  .branch-label.yes { background:#f59e0b; }
+
+  .section-divider { display:flex; align-items:center; width:90%; max-width:1000px; gap:12px; margin:20px auto 8px; }
+  .section-divider hr { flex:1; border:none; border-top:1.5px dashed #cbd5e1; }
+  .section-divider span { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#94a3b8; white-space:nowrap; }
+
+  /* persona path column */
+  .persona-path { display:flex; flex-direction:column; align-items:center; flex:1; max-width:240px; }
+
+  /* day group label */
+  .day-group { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; background:#e2e8f0; border-radius:20px; padding:2px 10px; margin-bottom:6px; }
+
+  /* mini delay pill */
+  .mini-delay { font-size:10px; color:#7c3aed; font-weight:600; background:#fdf4ff; border:1px solid #d8b4fe; border-radius:20px; padding:3px 12px; margin:5px 0; }
+</style>
+</head>
+<body>
+
+<h1>⚡ Campaign #104 — Workflow Blueprint</h1>
+<p class="subtitle">Onboarding_Flow_with_WA_23.03.2026 &nbsp;|&nbsp; Workspace 132866 &nbsp;|&nbsp; Wafeq &nbsp;|&nbsp; v4 — CIO-accurate layout</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="border-color:#fb923c;background:#fff7ed"></div> Trigger / Wait</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#22c55e;background:#f0fdf4"></div> Branch / Condition</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#3b82f6;background:#eff6ff"></div> Email</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#25D366;background:#f0fdf4"></div> WhatsApp</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#a855f7;background:#fdf4ff"></div> Time Delay</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#f59e0b;background:#fffbeb"></div> Goal</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#ef4444;background:#fef2f2"></div> Exit</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#cbd5e1;background:#f8fafc"></div> Disabled → DELETE</div>
+</div>
+
+<div class="flow">
+
+  <!-- TRIGGER -->
+  <div class="node trigger" style="width:280px;">
+    <div class="node-type">⚡ Trigger</div>
+    <div class="node-title">PROFILE_CREATED</div>
+    <div class="node-sub">Event: account created &bull; +1 filter</div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- GOALS -->
+  <div style="display:flex;gap:16px;justify-content:center;width:100%;">
+    <div class="node goal" style="width:230px;">
+      <div class="node-type">🏆 Goal 1 — ADD THIS</div>
+      <div class="node-title">invoice_created</div>
+      <div class="node-sub">Activation &bull; "Exit when achieved" OFF</div>
+      <span class="badge warn">⚠ Missing</span>
+    </div>
+    <div class="node goal" style="width:230px;">
+      <div class="node-type">🏆 Goal 2 ✅ Set</div>
+      <div class="node-title">STRIPE_SUBSCRIPTION_CREATED</div>
+      <div class="node-sub">Paid conversion &bull; 6-week window</div>
+      <span class="badge ok">✅ Configured</span>
+    </div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- WAIT UNTIL -->
+  <div class="node wait" style="width:280px;">
+    <div class="node-type">🖐 Wait Until</div>
+    <div class="node-title">Conditions are met</div>
+    <div class="node-sub">customer.language <em>exists</em></div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- LANGUAGE BRANCH -->
+  <div class="node branch" style="width:280px;">
+    <div class="node-type">🔀 Language Branch</div>
+    <div class="node-title">customer.language</div>
+    <div class="node-sub">
+      <span class="badge ar">AR → Arabic</span>&nbsp;
+      <span class="badge en">EN → English</span>
+    </div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- ══ WELCOME — bilingual ══ -->
+  <div class="section-divider"><hr><span>📧 💬 Welcome — Email + WhatsApp</span><hr></div>
+
+  <div class="branch-row">
+    <div class="branch-col" style="max-width:260px;">
+      <div class="branch-label ar">Arabic</div>
+      <!-- Email -->
+      <div class="node email" style="width:240px;">
+        <div class="node-type">📧 Email — Signup</div>
+        <div class="node-title">مرحباً! تم إنشاء حسابك 🎉</div>
+        <span class="badge tpl">Template 847</span>
+      </div>
+      <div class="vline"></div>
+      <!-- WhatsApp -->
+      <div class="node wa" style="width:240px;">
+        <div class="node-type">💬 WhatsApp</div>
+        <div class="node-title">أهلاً بك في وافق! 👋</div>
+        <div class="node-sub">"حسابك جاهز — ابدأ الآن"</div>
+        <span class="badge wa">WA Template</span>
+      </div>
+    </div>
+    <div class="branch-col" style="max-width:260px;">
+      <div class="branch-label en">English</div>
+      <!-- Email -->
+      <div class="node email" style="width:240px;">
+        <div class="node-type">📧 Email — Signup</div>
+        <div class="node-title">🎉 Welcome to Wafeq!</div>
+        <span class="badge tpl">Template 880</span>
+      </div>
+      <div class="vline"></div>
+      <!-- WhatsApp -->
+      <div class="node wa" style="width:240px;">
+        <div class="node-type">💬 WhatsApp</div>
+        <div class="node-title">Welcome to Wafeq! 👋</div>
+        <div class="node-sub">"Your account is ready — let's go!"</div>
+        <span class="badge wa">WA Template</span>
+      </div>
+    </div>
+  </div>
+  <div class="merge-bar" style="width:50%"></div>
+  <div class="vline"></div>
+
+  <div class="node delay" style="width:200px;">
+    <div class="node-type">⏱ Time Delay</div>
+    <div class="node-title">Wait 10 minutes</div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- ══ PERSONA BRANCH ══ -->
+  <div class="section-divider"><hr><span>👤 Persona Branch</span><hr></div>
+
+  <div class="node branch" style="width:300px;">
+    <div class="node-type">🔀 Segment Branch</div>
+    <div class="node-title">What best describes you?</div>
+    <div class="node-sub">
+      Attribute: <code>customer.persona</code><br>
+      <span class="badge" style="background:#ede9fe;color:#6d28d9;">business_owner</span>&nbsp;
+      <span class="badge" style="background:#e0f2fe;color:#0369a1;">run_business</span>&nbsp;
+      <span class="badge" style="background:#f1f5f9;color:#475569;">other</span>
+    </div>
+  </div>
+  <div class="vline"></div>
+
+  <!-- ══════════════════════════════════════
+       3-WAY PERSONA PATHS
+  ══════════════════════════════════════ -->
+  <div class="branch-row" style="gap:24px; align-items:flex-start; width:100%;">
+
+    <!-- ════ BUSINESS OWNER ════ -->
+    <div class="persona-path">
+      <div class="branch-label biz">💼 Business Owner</div>
+
+      <!-- Day 1 -->
+      <div class="day-group">Day 1</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 1</div>
+        <div class="node-title">💰 Get Paid Faster</div>
+        <div class="node-sub">"Create your first invoice in 60 seconds"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp</div>
+        <div class="node-title">Invoice tip 💡</div>
+        <div class="node-sub">"Quick tip: send your first invoice today!"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 2 -->
+      <div class="day-group">Day 2</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 2</div>
+        <div class="node-title">📊 Know Where Your Money Goes</div>
+        <div class="node-sub">"Snap a receipt, track every expense"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 5 -->
+      <div class="day-group">Day 5</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 3</div>
+        <div class="node-title">📈 See Your Business Health</div>
+        <div class="node-sub">"Your P&amp;L report is one click away"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Check-in</div>
+        <div class="node-title">How's it going? 🤝</div>
+        <div class="node-sub">"Need help getting started? We're here"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 8 -->
+      <div class="day-group">Day 8</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 4</div>
+        <div class="node-title">🧾 Stay VAT Compliant</div>
+        <div class="node-sub">"Never miss a VAT deadline again"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 11 -->
+      <div class="day-group">Day 11</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 5</div>
+        <div class="node-title">🏦 Connect Your Bank</div>
+        <div class="node-sub">"Auto-reconcile — save 5 hrs/week"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 12 -->
+      <div class="day-group">Day 12</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 6</div>
+        <div class="node-title">🌟 Customer Success Story</div>
+        <div class="node-sub">"See how businesses like yours grew"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Upgrade</div>
+        <div class="node-title">Unlock everything 🚀</div>
+        <div class="node-sub">"Upgrade now — your trial is ending soon"</div>
+      </div>
+    </div>
+
+    <!-- ════ RUN BUSINESS ════ -->
+    <div class="persona-path">
+      <div class="branch-label run">🏢 Run Business</div>
+
+      <!-- Day 1 -->
+      <div class="day-group">Day 1</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 1</div>
+        <div class="node-title">⚡ Scan Receipts Instantly</div>
+        <div class="node-sub">"OCR magic — upload receipt, done"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp</div>
+        <div class="node-title">Try OCR now 📸</div>
+        <div class="node-sub">"Snap a receipt to test it — takes 10 secs!"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 2 -->
+      <div class="day-group">Day 2</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 2</div>
+        <div class="node-title">🧾 File VAT in Minutes</div>
+        <div class="node-sub">"Step-by-step VAT — no accountant needed"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 5 -->
+      <div class="day-group">Day 5</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 3</div>
+        <div class="node-title">🏦 Bank Reconciliation on Autopilot</div>
+        <div class="node-sub">"Match transactions — zero errors"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Check-in</div>
+        <div class="node-title">How's it going? 🤝</div>
+        <div class="node-sub">"Need help setting up? We're here"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 8 -->
+      <div class="day-group">Day 8</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 4</div>
+        <div class="node-title">📋 Chart of Accounts &amp; Journals</div>
+        <div class="node-sub">"Set up your books in 10 minutes"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 11 -->
+      <div class="day-group">Day 11</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 5</div>
+        <div class="node-title">📊 Reports Your Team Will Love</div>
+        <div class="node-sub">"Share financial reports in one click"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 12 -->
+      <div class="day-group">Day 12</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 6</div>
+        <div class="node-title">🌍 Manage Multiple Entities</div>
+        <div class="node-sub">"All clients in one dashboard"</div>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Upgrade</div>
+        <div class="node-title">Unlock everything 🚀</div>
+        <div class="node-sub">"Upgrade now — your trial is ending soon"</div>
+      </div>
+    </div>
+
+    <!-- ════ OTHER ════ -->
+    <div class="persona-path">
+      <div class="branch-label oth">🌐 Other</div>
+
+      <!-- Day 1 -->
+      <div class="day-group">Day 1</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 1</div>
+        <div class="node-title">🚀 Create Your First Invoice</div>
+        <div class="node-sub">"Ready to send your first invoice?"</div>
+        <span class="badge tpl">Tpl 834/881</span>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp</div>
+        <div class="node-title">Invoice tip 💡</div>
+        <div class="node-sub">"Send your first invoice today!"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 2 -->
+      <div class="day-group">Day 2</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 2</div>
+        <div class="node-title">🧾 OCR Magic for Expenses</div>
+        <div class="node-sub">"Snap a receipt — we handle the rest"</div>
+        <span class="badge tpl">Tpl 843/853</span>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 5 -->
+      <div class="day-group">Day 5</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 3</div>
+        <div class="node-title">🧾 VAT Compliance Made Easy</div>
+        <div class="node-sub">"Everything ready for your VAT return"</div>
+        <span class="badge tpl">Tpl 866/848</span>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Check-in</div>
+        <div class="node-title">How's Wafeq working? 🤝</div>
+        <div class="node-sub">"How's everything going? Need help?"</div>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 8 -->
+      <div class="day-group">Day 8</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 4</div>
+        <div class="node-title">🌍 Multi-Entity &amp; Multi-Currency</div>
+        <div class="node-sub">"Manage all branches in one place"</div>
+        <span class="badge tpl">Tpl 842/873</span>
+      </div>
+      <div class="mini-delay">⏱ Wait 3 days</div>
+
+      <!-- Day 11 -->
+      <div class="day-group">Day 11</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 5</div>
+        <div class="node-title">🔄 Automation &amp; Reconciliation</div>
+        <div class="node-sub">"Spend less time on reconciliations"</div>
+        <span class="badge tpl">Tpl 867/836</span>
+      </div>
+      <div class="mini-delay">⏱ Wait 1 day</div>
+
+      <!-- Day 12 -->
+      <div class="day-group">Day 12</div>
+      <div class="node email">
+        <div class="node-type">📧 Email 6</div>
+        <div class="node-title">🌟 Customer Success Story</div>
+        <div class="node-sub">"How [Customer] saved hours with Wafeq"</div>
+        <span class="badge tpl">Tpl 850/849</span>
+      </div>
+      <div class="vline"></div>
+      <div class="node wa">
+        <div class="node-type">💬 WhatsApp — Upgrade</div>
+        <div class="node-title">Unlock everything 🚀</div>
+        <div class="node-sub">"Upgrade now — your trial is ending soon"</div>
+      </div>
+    </div>
+
+  </div><!-- end 3-way persona -->
+
+  <div class="merge-bar" style="width:80%; margin-top:16px;"></div>
+  <div class="vline"></div>
+
+  <!-- ══ CONDITIONAL ══ -->
+  <div class="section-divider"><hr><span>🔀 Conditional Logic</span><hr></div>
+
+  <div class="node cond" style="width:280px;">
+    <div class="node-type">🔀 Conditional Branch</div>
+    <div class="node-title">Is user still inactive?</div>
+    <div class="node-sub">Segment 19: never created an invoice</div>
+  </div>
+  <div class="vline"></div>
+
+  <div class="branch-row">
+    <div class="branch-col" style="max-width:240px;">
+      <div class="branch-label no">NO → Exit</div>
+      <div class="node exit" style="width:220px;">
+        <div class="node-type">🚪 Exit</div>
+        <div class="node-title">User is active ✅</div>
+        <div class="node-sub">Already created invoice — ends here</div>
+      </div>
+    </div>
+
+    <div class="branch-col" style="max-width:280px;">
+      <div class="branch-label yes">YES → Continue</div>
+
+      <div class="node wait" style="width:260px;">
+        <div class="node-type">🖐 Wait Until</div>
+        <div class="node-title">FREE_TRIAL_ENDED</div>
+        <div class="node-sub">Timeout: 14 days</div>
+      </div>
+      <div class="vline"></div>
+
+      <!-- Trial ending WA -->
+      <div class="node wa" style="width:260px;">
+        <div class="node-type">💬 WhatsApp — Urgent</div>
+        <div class="node-title">⚠️ Trial Ending Alert</div>
+        <div class="node-sub">"Your free trial ended — upgrade now to keep access"<br>Sent in user's language (AR/EN)</div>
+        <span class="badge new">New WA message</span>
+      </div>
+      <div class="vline"></div>
+
+      <div class="section-divider" style="width:100%; margin:8px auto 6px;"><hr><span>⏰ Trial Expiration Emails</span><hr></div>
+
+      <div class="branch-row" style="gap:10px;">
+        <div class="branch-col">
+          <div class="branch-label ar">Arabic</div>
+          <div class="node email" style="width:170px;">
+            <div class="node-type">📧 Downgrade</div>
+            <div class="node-title">⛔ انتهت الفترة التجريبية</div>
+            <span class="badge tpl">Tpl 838</span>
+          </div>
+        </div>
+        <div class="branch-col">
+          <div class="branch-label en">English</div>
+          <div class="node email" style="width:170px;">
+            <div class="node-type">📧 Downgrade</div>
+            <div class="node-title">⛔ Your trial has ended</div>
+            <span class="badge tpl">Tpl 844</span>
+          </div>
+        </div>
+      </div>
+      <div class="merge-bar" style="width:65%"></div>
+      <div class="vline"></div>
+      <div class="node delay" style="width:180px;"><div class="node-type">⏱ Delay</div><div class="node-title">Wait 2 days</div></div>
+      <div class="vline"></div>
+
+      <div class="node cond" style="width:260px;">
+        <div class="node-type">🔀 Conditional Branch</div>
+        <div class="node-title">Still not converted?</div>
+        <div class="node-sub">Segment 23: still on free</div>
+      </div>
+      <div class="vline"></div>
+
+      <!-- Last chance WA -->
+      <div class="node wa" style="width:260px;">
+        <div class="node-type">💬 WhatsApp — Last Chance</div>
+        <div class="node-title">🎁 Exclusive Offer</div>
+        <div class="node-sub">"Here's a special deal just for you — use code SAVE20"</div>
+        <span class="badge new">New WA message</span>
+      </div>
+      <div class="vline"></div>
+
+      <div class="section-divider" style="width:100%; margin:8px auto 6px;"><hr><span style="color:#ef4444;">🗑️ DELETE These Disabled Emails</span><hr></div>
+
+      <div class="branch-row" style="gap:10px;">
+        <div class="branch-col">
+          <div class="branch-label ar">Arabic</div>
+          <div class="node disabled" style="width:170px;">
+            <div class="node-type">📧 DISABLED</div>
+            <div class="node-title">عرض خصم 20%</div>
+            <div class="node-sub">Code: LAST20</div>
+            <span class="badge del">Tpl 831 — DELETE</span>
+          </div>
+        </div>
+        <div class="branch-col">
+          <div class="branch-label en">English</div>
+          <div class="node disabled" style="width:170px;">
+            <div class="node-type">📧 DISABLED</div>
+            <div class="node-title">20% Discount Offer</div>
+            <div class="node-sub">Code: LAST20</div>
+            <span class="badge del">Tpl 835 — DELETE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vline" style="margin-top:12px;"></div>
+
+  <!-- FINAL EXIT -->
+  <div class="section-divider"><hr><span>🏁 End</span><hr></div>
+  <div class="node exit" style="width:260px;">
+    <div class="node-type">🚪 Exit</div>
+    <div class="node-title">Campaign Complete</div>
+    <div class="node-sub">User finished the full onboarding flow</div>
+  </div>
+
+</div>
+
+<div style="text-align:center;margin-top:40px;font-size:11px;color:#94a3b8;line-height:2.2;">
+  Campaign #104 &bull; Workspace 132866 &bull; Wafeq &bull; v4 — CIO-accurate (Email + WhatsApp stacked)<br>
+  <a href="https://fly.customer.io/workspaces/132866/journeys/campaigns/104/setup/workflow/actions"
+     style="color:#6366f1;text-decoration:none;" target="_blank">
+    Open Campaign in Customer.io →
+  </a>
+</div>
+
+</body>
+</html>
